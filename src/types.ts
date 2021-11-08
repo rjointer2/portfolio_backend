@@ -7,7 +7,7 @@ export type Mail = {
 }
 
 export type Middleware = {
-    mailMiddleware: ( { from, to, subject, text } : Mail ) => { 
+    mailMiddleware: ({ from, to } : { from: string, to: string }) => { 
 
     }
 }

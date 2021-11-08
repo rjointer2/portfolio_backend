@@ -8,16 +8,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendMail = void 0;
+const nodemailer_1 = __importDefault(require("nodemailer"));
+const apollo_server_errors_1 = require("apollo-server-errors");
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const sendMail = (_, args, context) => __awaiter(void 0, void 0, void 0, function* () {
     const { mailMiddleware } = context;
-    mailMiddleware(args.input);
+    const { input } = args;
+    mailMiddleware({ from: input.from, to: input.to });
+    const transporter = nodemailer_1.default.createTransport({
+        service: "hotmail",
+        auth: {
+            user: input.from,
+            pass: process.env.hotmailPassword,
+        }
+    });
+    transporter.sendMail(args.input, (err, info) => {
+        if (err)
+            throw new apollo_server_errors_1.ApolloError(err.message);
+        console.log(info.accepted);
+        console.log(info.response);
+    });
     return {
-        from: "",
-        to: "",
-        subject: "",
-        text: "",
+        from: input.from,
+        to: input.to,
+        subject: input.subject,
+        text: input.text,
     };
 });
 exports.sendMail = sendMail;
